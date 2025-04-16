@@ -47,7 +47,13 @@ final class MainViewController: UIViewController {
         }
         
         exchangeRateService.fetchData(url: url) { [weak self] (result: ExchangeRateResult?) in
-            guard let self, let result else { return }
+            guard let self else { return }
+            guard let result else {
+                DispatchQueue.main.async {
+                    self.showAlert(title: "오류", message: "데이터를 불러올 수 없습니다.")
+                }
+                return
+            }
             
             let convertedRates = result.rates.map { (key, value) in
                 (country: key, rate: value)
@@ -58,6 +64,12 @@ final class MainViewController: UIViewController {
                 self.exchangeRateTableView.reloadData()
             }
         }
+    }
+    
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "확인", style: .default))
+        present(alert, animated: true)
     }
 }
 

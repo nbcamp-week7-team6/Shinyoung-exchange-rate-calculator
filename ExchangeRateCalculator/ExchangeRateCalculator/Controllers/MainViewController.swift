@@ -47,9 +47,12 @@ extension MainViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = exchangeRateTableView.dequeueReusableCell(withIdentifier: CellIdentifier.exchangeRate) else {
+        guard let cell = exchangeRateTableView.dequeueReusableCell(withIdentifier: CellIdentifier.exchangeRate) as? ExchangeRateTableViewCell else {
             return UITableViewCell()
         }
+        
+        let item = exchangeRates[indexPath.row]
+        cell.configure(country: item.country, rate: item.rate)
         
         return cell
     }    

@@ -11,12 +11,9 @@ import SnapKit
 final class MainViewController: UIViewController {
     private let exchangeRateTableView = ExchangeRateTableView()
     
-    private let exchangeRates: [(country: String, rate: Double)] = [
-        ("USA", 1.0),
-        ("Korea", 1330.25),
-        ("Japan", 154.3),
-        ("EU", 0.93)
-    ]
+    private let exchangeRateService = ExchangeRateService()
+    
+    private var exchangeRates = [(country: String, rate: Double)]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,6 +21,7 @@ final class MainViewController: UIViewController {
         setupViews()
         setupTableView()
         setupConstraints()
+        fetchExchangeRateData()
     }
     
     private func setupViews() {
@@ -37,6 +35,28 @@ final class MainViewController: UIViewController {
     private func setupConstraints() {
         exchangeRateTableView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+    }
+    
+    private func fetchExchangeRateData() {
+        let urlComponents = URLComponents(string: API.latestRates)
+        
+        guard let url = urlComponents?.url else {
+            print("잘못된 URL")
+            return
+        }
+        
+        exchangeRateService.fetchData(url: url) { [weak self] (result: ExchangeRateResult?) in
+            guard let self, let result else { return }
+            
+            let convertedRates = result.rates.map { (key, value) in
+                (country: key, rate: value)
+            }
+            
+            DispatchQueue.main.async {
+                self.exchangeRates = convertedRates
+                self.exchangeRateTableView.reloadData()
+            }
         }
     }
 }

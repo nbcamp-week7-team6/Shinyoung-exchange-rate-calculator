@@ -29,6 +29,11 @@ final class MainViewController: UIViewController {
         fetchExchangeRateData()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
     private func setupViews() {
         view.backgroundColor = .white
         

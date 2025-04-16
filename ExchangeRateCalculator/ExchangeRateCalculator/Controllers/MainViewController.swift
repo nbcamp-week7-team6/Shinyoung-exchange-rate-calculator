@@ -32,23 +32,21 @@ final class MainViewController: UIViewController {
     private func setupViews() {
         view.backgroundColor = .white
         
-//        view.addSubview(searchBar)
+        view.addSubview(searchBar)
         view.addSubview(exchangeRateTableView)
     }
     
     private func setupTableView() {
-        exchangeRateTableView.sectionHeaderTopPadding = 0
         exchangeRateTableView.dataSource = self
     }
     
     private func setupConstraints() {
-//        searchBar.snp.makeConstraints {
-//            $0.top.equalTo(view.safeAreaLayoutGuide)
-//            $0.leading.trailing.equalToSuperview()
-//        }
-        exchangeRateTableView.snp.makeConstraints {
+        searchBar.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
-//            $0.top.equalTo(searchBar.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+        }
+        exchangeRateTableView.snp.makeConstraints {
+            $0.top.equalTo(searchBar.snp.bottom)
             $0.leading.trailing.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }

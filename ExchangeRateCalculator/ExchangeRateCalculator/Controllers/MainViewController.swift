@@ -99,7 +99,18 @@ final class MainViewController: UIViewController {
 }
 
 extension MainViewController: UISearchBarDelegate {
-    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.isEmpty {
+            filteredExchangeRates = allExchangeRates
+        } else {
+            filteredExchangeRates = allExchangeRates.filter {
+                $0.code.lowercased().contains(searchText.lowercased()) ||
+                $0.countryName.contains(searchText)
+            }
+        }
+        
+        exchangeRateTableView.reloadData()
+    }
 }
 
 extension MainViewController: UITableViewDataSource {

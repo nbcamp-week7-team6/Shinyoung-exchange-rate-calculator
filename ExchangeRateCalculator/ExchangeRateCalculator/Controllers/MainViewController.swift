@@ -118,6 +118,15 @@ extension MainViewController: UISearchBarDelegate {
         }
         
         exchangeRateTableView.reloadData()
+        updateEmptyState()
+    }
+    
+    private func updateEmptyState() {
+        if filteredExchangeRates.isEmpty {
+            exchangeRateTableView.backgroundView = emptyStateLabel
+        } else {
+            exchangeRateTableView.backgroundView = nil
+        }
     }
 }
 

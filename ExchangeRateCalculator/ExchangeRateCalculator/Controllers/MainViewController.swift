@@ -18,7 +18,8 @@ final class MainViewController: UIViewController {
     
     private let exchangeRateService = ExchangeRateService()
     
-    private var exchangeRates = [ExchangeRateItem]()
+    private var allExchangeRates = [ExchangeRateItem]()
+    private var filteredExchangeRates = [ExchangeRateItem]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,7 +78,7 @@ final class MainViewController: UIViewController {
             let mapped = result.items
             
             DispatchQueue.main.async {
-                self.exchangeRates = mapped
+                self.allExchangeRates = mapped
                 self.exchangeRateTableView.reloadData()
             }
         }
@@ -92,7 +93,7 @@ final class MainViewController: UIViewController {
 
 extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return exchangeRates.count
+        return allExchangeRates.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -100,7 +101,7 @@ extension MainViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let item = exchangeRates[indexPath.row]
+        let item = allExchangeRates[indexPath.row]
         cell.configure(code: item.code, countryName: item.countryName, rate: item.rate)
         
         return cell

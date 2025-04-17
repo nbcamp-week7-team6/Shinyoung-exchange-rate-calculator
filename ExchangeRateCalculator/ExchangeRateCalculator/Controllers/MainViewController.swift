@@ -14,6 +14,14 @@ final class MainViewController: UIViewController {
         sb.placeholder = "통화 검색"
         return sb
     }()
+    private let emptyStateLabel: UILabel = {
+        let label = UILabel()
+        label.text = "검색 결과 없음"
+        label.textAlignment = .center
+        label.font = FontStyle.countryName
+        label.textColor = .gray
+        return label
+    }()
     private let exchangeRateTableView = ExchangeRateTableView()
     
     private let exchangeRateService = ExchangeRateService()

@@ -25,6 +25,7 @@ final class MainViewController: UIViewController {
         super.viewDidLoad()
         
         setupViews()
+        setupSearchBar()
         setupTableView()
         setupConstraints()
         fetchExchangeRateData()
@@ -40,6 +41,10 @@ final class MainViewController: UIViewController {
         
         view.addSubview(searchBar)
         view.addSubview(exchangeRateTableView)
+    }
+    
+    private func setupSearchBar() {
+        searchBar.delegate = self
     }
     
     private func setupTableView() {
@@ -78,6 +83,7 @@ final class MainViewController: UIViewController {
             let mapped = result.items
             
             DispatchQueue.main.async {
+                // allExchangeRates의 목적: 검색어를 지웠을 때 원래 데이터로 돌아가기 위함
                 self.allExchangeRates = mapped
                 self.filteredExchangeRates = mapped
                 self.exchangeRateTableView.reloadData()
@@ -90,6 +96,10 @@ final class MainViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "확인", style: .default))
         present(alert, animated: true)
     }
+}
+
+extension MainViewController: UISearchBarDelegate {
+    
 }
 
 extension MainViewController: UITableViewDataSource {

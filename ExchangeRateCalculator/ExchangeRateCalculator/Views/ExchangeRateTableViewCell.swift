@@ -9,12 +9,24 @@ import UIKit
 import SnapKit
 
 class ExchangeRateTableViewCell: UITableViewCell {
-    private let countryLabel: UILabel = {
+    private let currencyCodeLabel: UILabel = {
         let label = UILabel()
         return label
     }()
     
-    private let rateLabel: UILabel = {
+    private let countryNameLabel: UILabel = {
+        let label = UILabel()
+        return label
+    }()
+    
+    private let currencyInfoStackView: UIStackView = {
+        let sv = UIStackView()
+        sv.axis = .vertical
+        sv.spacing = 4
+        return sv
+    }()
+    
+    private let exchangeRateLabel: UILabel = {
         let label = UILabel()
         return label
     }()
@@ -31,24 +43,30 @@ class ExchangeRateTableViewCell: UITableViewCell {
     }
     
     private func setupViews() {
-        contentView.addSubview(countryLabel)
-        contentView.addSubview(rateLabel)
+        [
+            currencyCodeLabel,
+            countryNameLabel
+        ].forEach {
+            currencyInfoStackView.addArrangedSubview($0)
+        }
+        contentView.addSubview(currencyInfoStackView)
+        contentView.addSubview(exchangeRateLabel)
     }
     
     private func setupConstraints() {
-        countryLabel.snp.makeConstraints {
+        currencyInfoStackView.snp.makeConstraints {
             $0.leading.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
         }
         
-        rateLabel.snp.makeConstraints {
+        exchangeRateLabel.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
         }
     }
     
     func configure(country: String, rate: Double) {
-        countryLabel.text = country
-        rateLabel.text = String(format: "%.4f", rate)
+        currencyCodeLabel.text = country
+        exchangeRateLabel.text = String(format: "%.4f", rate)
     }
 }

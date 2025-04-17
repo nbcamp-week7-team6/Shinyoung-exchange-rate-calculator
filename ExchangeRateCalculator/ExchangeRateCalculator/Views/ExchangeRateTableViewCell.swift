@@ -11,11 +11,14 @@ import SnapKit
 class ExchangeRateTableViewCell: UITableViewCell {
     private let currencyCodeLabel: UILabel = {
         let label = UILabel()
+        label.font = FontStyle.currencyCode
         return label
     }()
     
     private let countryNameLabel: UILabel = {
         let label = UILabel()
+        label.font = FontStyle.countryName
+        label.textColor = .gray
         return label
     }()
     
@@ -28,6 +31,8 @@ class ExchangeRateTableViewCell: UITableViewCell {
     
     private let exchangeRateLabel: UILabel = {
         let label = UILabel()
+        label.font = FontStyle.rate
+        label.textAlignment = .right
         return label
     }()
     
@@ -49,6 +54,7 @@ class ExchangeRateTableViewCell: UITableViewCell {
         ].forEach {
             currencyInfoStackView.addArrangedSubview($0)
         }
+        
         contentView.addSubview(currencyInfoStackView)
         contentView.addSubview(exchangeRateLabel)
     }
@@ -62,6 +68,8 @@ class ExchangeRateTableViewCell: UITableViewCell {
         exchangeRateLabel.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
+            $0.leading.equalTo(currencyInfoStackView.snp.trailing).offset(16)
+            $0.width.equalTo(120)
         }
     }
     

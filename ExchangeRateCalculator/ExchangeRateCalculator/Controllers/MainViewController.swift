@@ -43,6 +43,7 @@ final class MainViewController: UIViewController {
     
     private func setupTableView() {
         exchangeRateTableView.dataSource = self
+        exchangeRateTableView.rowHeight = 60
     }
     
     private func setupConstraints() {
@@ -103,5 +104,5 @@ extension MainViewController: UITableViewDataSource {
         cell.configure(code: item.code, countryName: item.countryName, rate: item.rate)
         
         return cell
-    }    
+    }
 }

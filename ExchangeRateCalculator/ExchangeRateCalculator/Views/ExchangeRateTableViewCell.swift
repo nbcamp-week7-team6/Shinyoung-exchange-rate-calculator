@@ -65,8 +65,9 @@ class ExchangeRateTableViewCell: UITableViewCell {
         }
     }
     
-    func configure(country: String, rate: Double) {
-        currencyCodeLabel.text = country
+    func configure(code: String, countryName: String, rate: Double) {
+        currencyCodeLabel.text = code
+        countryNameLabel.text = countryName
         exchangeRateLabel.text = String(format: "%.4f", rate)
     }
 }

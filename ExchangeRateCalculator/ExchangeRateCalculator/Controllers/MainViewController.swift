@@ -18,7 +18,7 @@ final class MainViewController: UIViewController {
     
     private let exchangeRateService = ExchangeRateService()
     
-    private var exchangeRates = [(country: String, rate: Double)]()
+    private var exchangeRates = [ExchangeRateItem]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,12 +73,10 @@ final class MainViewController: UIViewController {
                 return
             }
             
-            let convertedRates = result.rates.map { (key, value) in
-                (country: key, rate: value)
-            }
+            let mapped = result.items
             
             DispatchQueue.main.async {
-                self.exchangeRates = convertedRates
+                self.exchangeRates = mapped
                 self.exchangeRateTableView.reloadData()
             }
         }
@@ -102,7 +100,7 @@ extension MainViewController: UITableViewDataSource {
         }
         
         let item = exchangeRates[indexPath.row]
-        cell.configure(country: item.country, rate: item.rate)
+        cell.configure(code: item.code, countryName: item.countryName, rate: item.rate)
         
         return cell
     }    

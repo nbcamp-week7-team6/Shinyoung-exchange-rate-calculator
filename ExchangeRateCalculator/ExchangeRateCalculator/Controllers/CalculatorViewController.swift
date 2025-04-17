@@ -6,16 +6,15 @@
 //
 
 import UIKit
+import SnapKit
 
 class CalculatorViewController: UIViewController {
-    private let code: String
-    private let countryName: String
-    private let rate: Double
+    private let item: ExchangeRateItem
     
-    init(code: String, countryName: String, rate: Double) {
-        self.code = code
-        self.countryName = countryName
-        self.rate = rate
+    private let calculatorView = CalculatorView()
+    
+    init(item: ExchangeRateItem) {
+        self.item = item
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -25,7 +24,21 @@ class CalculatorViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        setupViews()
+        setupConstraints()
+        calculatorView.configure(with: item)
     }
-
+    
+    private func setupViews() {
+        view.backgroundColor = .white
+        view.addSubview(calculatorView)
+    }
+    
+    private func setupConstraints() {
+        calculatorView.snp.makeConstraints {
+            $0.top.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview()
+        }
+    }
 }

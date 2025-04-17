@@ -9,6 +9,13 @@ import UIKit
 import SnapKit
 
 final class MainViewController: UIViewController {
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "환율 정보"
+        label.font = UIFont.boldSystemFont(ofSize: 24)
+        label.textColor = .label
+        return label
+    }()
     private let searchBar: UISearchBar = {
         let sb = UISearchBar()
         sb.placeholder = "통화 검색"
@@ -18,7 +25,7 @@ final class MainViewController: UIViewController {
         let label = UILabel()
         label.text = "검색 결과 없음"
         label.textAlignment = .center
-        label.font = FontStyle.countryName
+        label.font = FontStyle.Main.countryName
         label.textColor = .gray
         return label
     }()
@@ -39,16 +46,16 @@ final class MainViewController: UIViewController {
         fetchExchangeRateData()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: false)
-    }
-    
     private func setupViews() {
         view.backgroundColor = .white
         
-        view.addSubview(searchBar)
-        view.addSubview(exchangeRateTableView)
+        [
+            titleLabel,
+            searchBar,
+            exchangeRateTableView
+        ].forEach {
+            view.addSubview($0)
+        }
     }
     
     private func setupSearchBar() {
@@ -56,13 +63,18 @@ final class MainViewController: UIViewController {
     }
     
     private func setupTableView() {
+        exchangeRateTableView.delegate = self
         exchangeRateTableView.dataSource = self
         exchangeRateTableView.rowHeight = 60
     }
     
     private func setupConstraints() {
-        searchBar.snp.makeConstraints {
+        titleLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.equalToSuperview().inset(24)
+        }
+        searchBar.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom)
             $0.leading.trailing.equalToSuperview()
         }
         exchangeRateTableView.snp.makeConstraints {
@@ -141,8 +153,16 @@ extension MainViewController: UITableViewDataSource {
         }
         
         let item = filteredExchangeRates[indexPath.row]
-        cell.configure(code: item.code, countryName: item.countryName, rate: item.rate)
+        cell.configure(with: item)
         
         return cell
+    }
+}
+
+extension MainViewController: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedRate = filteredExchangeRates[indexPath.row]
+        let calculatorVC = CalculatorViewController(item: selectedRate)
+        navigationController?.pushViewController(calculatorVC, animated: true)
     }
 }

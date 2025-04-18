@@ -111,4 +111,8 @@ class CalculatorView: UIView {
         currencyCodeLabel.text = item.code
         countryNameLabel.text = item.countryName
     }
+    
+    func showResult(_ text: String) {
+        resultLabel.text = text
+    }
 }

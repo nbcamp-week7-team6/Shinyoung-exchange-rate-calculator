@@ -64,6 +64,18 @@ class CalculatorViewController: UIViewController {
     }
     
     @objc private func convertButtonTapped() {
-        print("환율 계산")
+        guard let text = calculatorView.inputAmount, !text.isEmpty else {
+            self.showAlert(title: "오류", message: "금액을 입력해주세요.")
+            return
+        }
+        guard let amount = Double(text) else {
+            self.showAlert(title: "오류", message: "올바른 숫자를 입력해주세요.")
+            return
+        }
+        
+        let result = amount * item.rate
+        let formattedAmount = String(format: "%.2f", amount)
+        let formattedResult = String(format: "%.2f", result)
+        calculatorView.showResult("$\(formattedAmount) → \(formattedResult) \(item.code)")
     }
 }

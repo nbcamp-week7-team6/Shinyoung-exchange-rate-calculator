@@ -35,7 +35,7 @@ class CalculatorView: UIView {
         tf.placeholder = "금액을 입력하세요."
         return tf
     }()
-    private let convertButton: UIButton = {
+    let convertButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
@@ -54,6 +54,10 @@ class CalculatorView: UIView {
         return label
     }()
     
+    var inputAmount: String? {
+        return amountTextField.text
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -69,18 +73,14 @@ class CalculatorView: UIView {
         [
             currencyCodeLabel,
             countryNameLabel,
-        ].forEach {
-            currencyInfoStackView.addArrangedSubview($0)
-        }
+        ].forEach { currencyInfoStackView.addArrangedSubview($0) }
         
         [
             currencyInfoStackView,
             amountTextField,
             convertButton,
             resultLabel
-        ].forEach {
-            addSubview($0)
-        }
+        ].forEach { addSubview($0) }
     }
     
     private func setupConstraints() {

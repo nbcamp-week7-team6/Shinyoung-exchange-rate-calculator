@@ -16,8 +16,7 @@ class CalculatorViewController: UIViewController {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "환율 계산기"
-        label.font = UIFont.boldSystemFont(ofSize: 24)
-        label.textColor = .label
+        label.font = FontStyle.titleLabel
         return label
     }()
     
@@ -36,13 +35,15 @@ class CalculatorViewController: UIViewController {
         setupViews()
         setupConstraints()
         calculatorView.configure(with: item)
-        
-        self.navigationItem.backButtonTitle = "환율 정보"
+        calculatorView.convertButton.addTarget(
+            self,
+            action: #selector(convertButtonTapped),
+            for: .touchUpInside
+        )
     }
     
     private func setupViews() {
         view.backgroundColor = .white
-        
         [
             titleLabel,
             calculatorView
@@ -58,6 +59,11 @@ class CalculatorViewController: UIViewController {
         calculatorView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom)
             $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
         }
+    }
+    
+    @objc private func convertButtonTapped() {
+        print("환율 계산")
     }
 }

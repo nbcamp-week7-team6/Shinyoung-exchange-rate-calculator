@@ -17,6 +17,8 @@ enum API {
 }
 
 enum FontStyle {
+    static let titleLabel = UIFont.systemFont(ofSize: 24, weight: .bold)
+    
     enum Main {
         static let currencyCode = UIFont.systemFont(ofSize: 16, weight: .medium)
         static let countryName = UIFont.systemFont(ofSize: 14)

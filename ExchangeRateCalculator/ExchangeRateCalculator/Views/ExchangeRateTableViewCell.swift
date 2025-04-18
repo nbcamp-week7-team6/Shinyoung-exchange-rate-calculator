@@ -11,13 +11,13 @@ import SnapKit
 class ExchangeRateTableViewCell: UITableViewCell {
     private let currencyCodeLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.currencyCode
+        label.font = FontStyle.HomeView.currencyCode
         return label
     }()
     
     private let countryNameLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.countryName
+        label.font = FontStyle.HomeView.countryName
         label.textColor = .gray
         return label
     }()
@@ -31,7 +31,7 @@ class ExchangeRateTableViewCell: UITableViewCell {
     
     private let exchangeRateLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.rate
+        label.font = FontStyle.HomeView.rate
         label.textAlignment = .right
         return label
     }()
@@ -43,6 +43,7 @@ class ExchangeRateTableViewCell: UITableViewCell {
         setupConstraints()
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -73,9 +74,9 @@ class ExchangeRateTableViewCell: UITableViewCell {
         }
     }
     
-    func configure(code: String, countryName: String, rate: Double) {
-        currencyCodeLabel.text = code
-        countryNameLabel.text = countryName
-        exchangeRateLabel.text = String(format: "%.4f", rate)
+    func configure(with item: ExchangeRateItem) {
+        currencyCodeLabel.text = item.code
+        countryNameLabel.text = item.countryName
+        exchangeRateLabel.text = String(format: "%.4f", item.rate)
     }
 }

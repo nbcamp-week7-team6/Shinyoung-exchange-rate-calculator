@@ -17,7 +17,18 @@ enum API {
 }
 
 enum FontStyle {
-    static let currencyCode = UIFont.systemFont(ofSize: 16, weight: .medium)
-    static let countryName = UIFont.systemFont(ofSize: 14)
-    static let rate = UIFont.systemFont(ofSize: 16)
+    static let titleLabel = UIFont.systemFont(ofSize: 24, weight: .bold)
+    
+    enum HomeView {
+        static let currencyCode = UIFont.systemFont(ofSize: 16, weight: .medium)
+        static let countryName = UIFont.systemFont(ofSize: 14)
+        static let rate = UIFont.systemFont(ofSize: 16)
+    }
+    
+    enum CalculatorView {
+        static let currencyCode = UIFont.systemFont(ofSize: 24, weight: .bold)
+        static let countryName = UIFont.systemFont(ofSize: 16)
+        static let convertButton = UIFont.systemFont(ofSize: 16, weight: .medium)
+        static let resultLabel = UIFont.systemFont(ofSize: 20, weight: .medium)
+    }
 }

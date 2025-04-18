@@ -71,10 +71,10 @@ final class MainViewController: UIViewController {
     private func setupConstraints() {
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
-            $0.leading.equalToSuperview().inset(24)
+            $0.leading.equalToSuperview().inset(16)
         }
         searchBar.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview()
         }
         exchangeRateTableView.snp.makeConstraints {

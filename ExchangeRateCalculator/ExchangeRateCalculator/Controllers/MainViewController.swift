@@ -24,7 +24,7 @@ final class MainViewController: UIViewController {
         let label = UILabel()
         label.text = "검색 결과 없음"
         label.textAlignment = .center
-        label.font = FontStyle.Main.countryName
+        label.font = FontStyle.HomeView.countryName
         label.textColor = .gray
         return label
     }()

@@ -11,12 +11,12 @@ import SnapKit
 class CalculatorView: UIView {
     private let currencyCodeLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.Calculator.currencyCode
+        label.font = FontStyle.CalculatorView.currencyCode
         return label
     }()
     private let countryNameLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.Calculator.countryName
+        label.font = FontStyle.CalculatorView.countryName
         label.textColor = .gray
         return label
     }()
@@ -39,7 +39,7 @@ class CalculatorView: UIView {
         let button = UIButton()
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = FontStyle.Calculator.convertButton
+        button.titleLabel?.font = FontStyle.CalculatorView.convertButton
         button.setTitle("환율 계산", for: .normal)
         button.layer.cornerRadius = 8
         button.clipsToBounds = true
@@ -47,7 +47,7 @@ class CalculatorView: UIView {
     }()
     private let resultLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.Calculator.resultLabel
+        label.font = FontStyle.CalculatorView.resultLabel
         label.textAlignment = .center
         label.text = "계산 결과가 여기에 표시됩니다."
         label.numberOfLines = 0

@@ -11,13 +11,13 @@ import SnapKit
 class ExchangeRateTableViewCell: UITableViewCell {
     private let currencyCodeLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.Main.currencyCode
+        label.font = FontStyle.HomeView.currencyCode
         return label
     }()
     
     private let countryNameLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.Main.countryName
+        label.font = FontStyle.HomeView.countryName
         label.textColor = .gray
         return label
     }()
@@ -31,7 +31,7 @@ class ExchangeRateTableViewCell: UITableViewCell {
     
     private let exchangeRateLabel: UILabel = {
         let label = UILabel()
-        label.font = FontStyle.Main.rate
+        label.font = FontStyle.HomeView.rate
         label.textAlignment = .right
         return label
     }()

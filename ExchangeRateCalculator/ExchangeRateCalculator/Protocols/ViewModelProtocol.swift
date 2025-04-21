@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ExchangeRateViewModelProtocol {
+protocol ViewModelProtocol {
     associatedtype Action
     associatedtype State
     

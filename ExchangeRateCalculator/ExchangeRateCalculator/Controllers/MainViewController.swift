@@ -30,10 +30,10 @@ final class MainViewController: UIViewController {
     }()
     private let exchangeRateTableView = ExchangeRateTableView()
     
-    private let exchangeRateService = ExchangeRateService()
-    
     private var allExchangeRates = [ExchangeRateItem]()
     private var filteredExchangeRates = [ExchangeRateItem]()
+    
+    private let viewModel = ExchangeRateViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +42,8 @@ final class MainViewController: UIViewController {
         setupSearchBar()
         setupTableView()
         setupConstraints()
-        fetchExchangeRateData()
+        bindViewModel()
+        viewModel.action?(.fetch)
         
         self.navigationItem.backButtonTitle = "환율 정보"
     }
@@ -81,30 +82,15 @@ final class MainViewController: UIViewController {
         }
     }
     
-    private func fetchExchangeRateData() {
-        let urlComponents = URLComponents(string: API.latestRates)
-        
-        guard let url = urlComponents?.url else {
-            print("잘못된 URL")
-            return
-        }
-        
-        exchangeRateService.fetchData(url: url) { [weak self] (result: ExchangeRateResult?) in
-            guard let self else { return }
-            guard let result else {
-                DispatchQueue.main.async {
-                    self.showAlert(title: "오류", message: "데이터를 불러올 수 없습니다.")
-                }
-                return
-            }
-            
-            let mapped = result.items
-            
-            DispatchQueue.main.async {
-                // allExchangeRates의 목적: 검색어를 지웠을 때 원래 데이터로 돌아가기 위함
-                self.allExchangeRates = mapped
-                self.filteredExchangeRates = mapped
-                self.exchangeRateTableView.reloadData()
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] state in
+            switch state {
+            case .success(let items):
+                self?.allExchangeRates = items
+                self?.filteredExchangeRates = items
+                self?.exchangeRateTableView.reloadData()
+            case .failure(let message):
+                self?.showAlert(title: "오류", message: message)
             }
         }
     }

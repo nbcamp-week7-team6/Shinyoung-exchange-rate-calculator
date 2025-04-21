@@ -24,7 +24,7 @@ final class ExchangeRateViewModel: ExchangeRateViewModelProtocol {
         case navigateToCalculator(selectedItem: ExchangeRateItem)
     }
     
-    private let exchangeRateService = ExchangeRateService()
+    private let networkService = NetworkService()
     
     private var allExchangeRates = [ExchangeRateItem]()
     
@@ -53,7 +53,7 @@ final class ExchangeRateViewModel: ExchangeRateViewModelProtocol {
     private func fetchExchangeRate() {
         guard let url = URL(string: API.latestRates) else { return }
         
-        exchangeRateService.fetchData(url: url) { [weak self] (result: ExchangeRateResult?) in
+        networkService.fetchData(url: url) { [weak self] (result: ExchangeRateResult?) in
             guard let self else { return }
             
             DispatchQueue.main.async {

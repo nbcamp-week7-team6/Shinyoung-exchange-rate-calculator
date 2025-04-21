@@ -87,6 +87,9 @@ final class MainViewController: UIViewController {
                 self?.exchangeRateTableView.reloadData()
             case .failure(let message):
                 self?.showAlert(title: "오류", message: message)
+            case .navigateToCalculator(let selectedItem):
+                let calculatorVC = CalculatorViewController(item: selectedItem)
+                self?.navigationController?.pushViewController(calculatorVC, animated: true)
             }
         }
     }
@@ -125,8 +128,6 @@ extension MainViewController: UITableViewDataSource {
 
 extension MainViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedRate = viewModel.state.items[indexPath.row]
-        let calculatorVC = CalculatorViewController(item: selectedRate)
-        navigationController?.pushViewController(calculatorVC, animated: true)
+        viewModel.action?(.selectItem(index: indexPath.row))
     }
 }

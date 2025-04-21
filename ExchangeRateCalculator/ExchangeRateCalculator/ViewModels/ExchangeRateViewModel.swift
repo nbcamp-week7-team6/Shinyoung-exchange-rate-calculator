@@ -11,6 +11,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     enum Action {
         case fetch
         case search(String)
+        case selectItem(index: Int)
     }
     
     struct State {
@@ -20,6 +21,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     enum ViewState {
         case success([ExchangeRateItem])
         case failure(message: String)
+        case navigateToCalculator(selectedItem: ExchangeRateItem)
     }
     
     private let exchangeRateService = ExchangeRateService()
@@ -42,6 +44,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 self?.fetchExchangeRate()
             case .search(let keyword):
                 self?.filterExchangeRates(with: keyword)
+            case .selectItem(index: let index):
+                self?.handleSelection(at: index)
             }
         }
     }
@@ -82,5 +86,12 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         DispatchQueue.main.async {
             self.onStateChange?(.success(filteredExchangeRates))            
         }
+    }
+    
+    private func handleSelection(at index: Int) {
+        guard index >= 0, index < state.items.count else { return }
+        
+        let selectedItem = state.items[index]
+        onStateChange?(.navigateToCalculator(selectedItem: selectedItem))
     }
 }

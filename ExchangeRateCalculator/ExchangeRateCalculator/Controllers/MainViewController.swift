@@ -128,6 +128,7 @@ extension MainViewController: UITableViewDataSource {
 
 extension MainViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        exchangeRateTableView.deselectRow(at: indexPath, animated: true)
         viewModel.action?(.selectItem(index: indexPath.row))
     }
 }

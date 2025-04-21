@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class ExchangeRateViewModel: ViewModelProtocol {
+final class ExchangeRateViewModel: ExchangeRateViewModelProtocol {
     enum Action {
         case fetch
         case search(String)

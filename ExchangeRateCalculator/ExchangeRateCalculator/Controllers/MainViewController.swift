@@ -30,9 +30,6 @@ final class MainViewController: UIViewController {
     }()
     private let exchangeRateTableView = ExchangeRateTableView()
     
-    private var allExchangeRates = [ExchangeRateItem]()
-    private var filteredExchangeRates = [ExchangeRateItem]()
-    
     private let viewModel = ExchangeRateViewModel()
     
     override func viewDidLoad() {
@@ -86,33 +83,16 @@ final class MainViewController: UIViewController {
         viewModel.onStateChange = { [weak self] state in
             switch state {
             case .success(let items):
-                self?.allExchangeRates = items
-                self?.filteredExchangeRates = items
+                self?.updateEmptyState(items)
                 self?.exchangeRateTableView.reloadData()
             case .failure(let message):
                 self?.showAlert(title: "오류", message: message)
             }
         }
     }
-}
-
-extension MainViewController: UISearchBarDelegate {
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchText.isEmpty {
-            filteredExchangeRates = allExchangeRates
-        } else {
-            filteredExchangeRates = allExchangeRates.filter {
-                $0.code.lowercased().contains(searchText.lowercased()) ||
-                $0.countryName.contains(searchText)
-            }
-        }
-        
-        exchangeRateTableView.reloadData()
-        updateEmptyState()
-    }
     
-    private func updateEmptyState() {
-        if filteredExchangeRates.isEmpty {
+    private func updateEmptyState(_ items: [ExchangeRateItem]) {
+        if items.isEmpty {
             exchangeRateTableView.backgroundView = emptyStateLabel
         } else {
             exchangeRateTableView.backgroundView = nil
@@ -120,9 +100,15 @@ extension MainViewController: UISearchBarDelegate {
     }
 }
 
+extension MainViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel.action?(.search(searchText))
+    }
+}
+
 extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return filteredExchangeRates.count
+        return viewModel.state.items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -130,7 +116,7 @@ extension MainViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let item = filteredExchangeRates[indexPath.row]
+        let item = viewModel.state.items[indexPath.row]
         cell.configure(with: item)
         
         return cell
@@ -139,7 +125,7 @@ extension MainViewController: UITableViewDataSource {
 
 extension MainViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedRate = filteredExchangeRates[indexPath.row]
+        let selectedRate = viewModel.state.items[indexPath.row]
         let calculatorVC = CalculatorViewController(item: selectedRate)
         navigationController?.pushViewController(calculatorVC, animated: true)
     }

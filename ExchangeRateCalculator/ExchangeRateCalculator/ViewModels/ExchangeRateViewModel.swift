@@ -8,8 +8,6 @@
 import Foundation
 
 final class ExchangeRateViewModel: ViewModelProtocol {
-    private let exchangeRateService = ExchangeRateService()
-    
     enum Action {
         case fetch
         case search(String)
@@ -19,13 +17,17 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         var items = [ExchangeRateItem]()
     }
     
-    var action: ((Action) -> Void)?
-    private(set) var state = State()
-    
     enum ViewState {
         case success([ExchangeRateItem])
         case failure(message: String)
     }
+    
+    private let exchangeRateService = ExchangeRateService()
+    
+    private var allExchangeRates = [ExchangeRateItem]()
+    
+    var action: ((Action) -> Void)?
+    private(set) var state = State()
     
     var onStateChange: ((ViewState) -> Void)?
     
@@ -39,8 +41,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             case .fetch:
                 self?.fetchExchangeRate()
             case .search(let keyword):
-                print("search: \(keyword)")
-                break
+                self?.filterExchangeRates(with: keyword)
             }
         }
     }
@@ -58,9 +59,28 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 }
                 
                 let mapped = result.items
+                self.allExchangeRates = mapped
                 self.state.items = mapped
                 self.onStateChange?(.success(mapped))
             }
+        }
+    }
+    
+    private func filterExchangeRates(with keyword: String) {
+        let filteredExchangeRates: [ExchangeRateItem]
+        
+        if keyword.isEmpty {
+            filteredExchangeRates = allExchangeRates
+        } else {
+            filteredExchangeRates = allExchangeRates.filter {
+                $0.code.lowercased().contains(keyword.lowercased()) ||
+                $0.countryName.contains(keyword)
+            }
+        }
+        
+        self.state.items = filteredExchangeRates
+        DispatchQueue.main.async {
+            self.onStateChange?(.success(filteredExchangeRates))            
         }
     }
 }

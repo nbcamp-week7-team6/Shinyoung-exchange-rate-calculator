@@ -73,4 +73,18 @@ final class CoreDataService {
             print("Core Data 저장 실패: \(error.localizedDescription)")
         }
     }
+    
+    func fetchCachedRates() -> [String: Double] {
+        let request = CachedExchangeRate.fetchRequest()
+        do {
+            let results = try context.fetch(request)
+            return Dictionary(uniqueKeysWithValues: results.compactMap {
+                guard let code = $0.code else { return nil }
+                return (code, $0.rate)
+            })
+        } catch {
+            print("캐시 데이터 로드 실패")
+            return [:]
+        }
+    }
 }

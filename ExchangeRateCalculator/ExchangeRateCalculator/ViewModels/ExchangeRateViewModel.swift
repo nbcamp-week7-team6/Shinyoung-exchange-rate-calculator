@@ -12,6 +12,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         case fetch
         case search(String)
         case selectItem(index: Int)
+        case toggleFavorite(code: String)
     }
     
     struct State {
@@ -25,12 +26,10 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     }
     
     private let networkService = NetworkService()
-    
     private var allExchangeRates = [ExchangeRateItem]()
     
     var action: ((Action) -> Void)?
     private(set) var state = State()
-    
     var onStateChange: ((ViewState) -> Void)?
     
     init() {
@@ -46,6 +45,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 self?.filterExchangeRates(with: keyword)
             case .selectItem(index: let index):
                 self?.handleSelection(at: index)
+            case .toggleFavorite(let code):
+                self?.toggleFavorite(code: code)
             }
         }
     }
@@ -62,7 +63,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                     return
                 }
                 
-                let mapped = result.items.sorted { $0.code < $1.code }
+                let mapped = self.applyFavoriteSorting(to: result.items)
                 
                 self.allExchangeRates = mapped
                 self.state.items = mapped
@@ -83,9 +84,11 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             }
         }
         
-        self.state.items = filteredExchangeRates
+        let sorted = applyFavoriteSorting(to: filteredExchangeRates)
+        self.state.items = sorted
+        
         DispatchQueue.main.async {
-            self.onStateChange?(.success(filteredExchangeRates))            
+            self.onStateChange?(.success(sorted))
         }
     }
     
@@ -94,5 +97,28 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         
         let selectedItem = state.items[index]
         onStateChange?(.navigateToCalculator(selectedItem: selectedItem))
+    }
+    
+    private func toggleFavorite(code: String) {
+        let isFavorite = CoreDataService.shared.fetchFavorites().contains(code)
+        
+        if isFavorite {
+            CoreDataService.shared.removeFavorite(code: code)
+        } else {
+            CoreDataService.shared.addFavorite(code: code)
+        }
+        
+        filterExchangeRates(with: "")
+    }
+    
+    private func applyFavoriteSorting(to items: [ExchangeRateItem]) -> [ExchangeRateItem] {
+        let favorites = Set(CoreDataService.shared.fetchFavorites())
+        
+        return items.sorted {
+            if favorites.contains($0.code) == favorites.contains($1.code) {
+                return $0.code < $1.code
+            }
+            return favorites.contains($0.code)
+        }
     }
 }

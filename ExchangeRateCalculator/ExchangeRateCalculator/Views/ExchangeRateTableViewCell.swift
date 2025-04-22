@@ -8,7 +8,13 @@
 import UIKit
 import SnapKit
 
+protocol ExchangeRateTableViewCellDelegate: AnyObject {
+    func didTapFavoriteButton(in cell: ExchangeRateTableViewCell)
+}
+
 class ExchangeRateTableViewCell: UITableViewCell {
+    weak var delegate: ExchangeRateTableViewCellDelegate?
+    
     private let currencyCodeLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.HomeView.currencyCode
@@ -37,8 +43,9 @@ class ExchangeRateTableViewCell: UITableViewCell {
     }()
     
     private let favoriteButton: UIButton = {
-        let button = UIButton(type: .custom)
+        let button = UIButton()
         button.setImage(UIImage(named: "star.png"), for: .normal)
+        button.setImage(UIImage(named: "star.fill.png"), for: .selected)
         return button
     }()
     
@@ -65,6 +72,8 @@ class ExchangeRateTableViewCell: UITableViewCell {
             exchangeRateLabel,
             favoriteButton
         ].forEach { contentView.addSubview($0) }
+        
+        favoriteButton.addTarget(self, action: #selector(favoriteTapped), for: .touchUpInside)
     }
     
     private func setupConstraints() {
@@ -87,9 +96,14 @@ class ExchangeRateTableViewCell: UITableViewCell {
         }
     }
     
-    func configure(with item: ExchangeRateItem) {
+    func configure(with item: ExchangeRateItem, isFavorite: Bool) {
         currencyCodeLabel.text = item.code
         countryNameLabel.text = item.countryName
         exchangeRateLabel.text = String(format: "%.4f", item.rate)
+        favoriteButton.isSelected = isFavorite
+    }
+    
+    @objc private func favoriteTapped() {
+        delegate?.didTapFavoriteButton(in: self)
     }
 }

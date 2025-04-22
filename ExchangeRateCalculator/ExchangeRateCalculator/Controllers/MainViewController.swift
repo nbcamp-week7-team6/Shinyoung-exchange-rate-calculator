@@ -120,7 +120,10 @@ extension MainViewController: UITableViewDataSource {
         }
         
         let item = viewModel.state.items[indexPath.row]
-        cell.configure(with: item)
+        let isFavorite = Set(CoreDataService.shared.fetchFavorites()).contains(item.code)
+        
+        cell.delegate = self
+        cell.configure(with: item, isFavorite: isFavorite)
         
         return cell
     }
@@ -130,5 +133,13 @@ extension MainViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         exchangeRateTableView.deselectRow(at: indexPath, animated: true)
         viewModel.action?(.selectItem(index: indexPath.row))
+    }
+}
+
+extension MainViewController: ExchangeRateTableViewCellDelegate {
+    func didTapFavoriteButton(in cell: ExchangeRateTableViewCell) {
+        guard let indexPath = exchangeRateTableView.indexPath(for: cell) else { return }
+        let item = viewModel.state.items[indexPath.row]
+        viewModel.action?(.toggleFavorite(code: item.code))
     }
 }

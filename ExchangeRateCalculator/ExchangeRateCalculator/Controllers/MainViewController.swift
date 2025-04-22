@@ -30,10 +30,7 @@ final class MainViewController: UIViewController {
     }()
     private let exchangeRateTableView = ExchangeRateTableView()
     
-    private let exchangeRateService = ExchangeRateService()
-    
-    private var allExchangeRates = [ExchangeRateItem]()
-    private var filteredExchangeRates = [ExchangeRateItem]()
+    private let viewModel = ExchangeRateViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +39,8 @@ final class MainViewController: UIViewController {
         setupSearchBar()
         setupTableView()
         setupConstraints()
-        fetchExchangeRateData()
+        bindViewModel()
+        viewModel.action?(.fetch)
         
         self.navigationItem.backButtonTitle = "환율 정보"
     }
@@ -81,52 +79,23 @@ final class MainViewController: UIViewController {
         }
     }
     
-    private func fetchExchangeRateData() {
-        let urlComponents = URLComponents(string: API.latestRates)
-        
-        guard let url = urlComponents?.url else {
-            print("잘못된 URL")
-            return
-        }
-        
-        exchangeRateService.fetchData(url: url) { [weak self] (result: ExchangeRateResult?) in
-            guard let self else { return }
-            guard let result else {
-                DispatchQueue.main.async {
-                    self.showAlert(title: "오류", message: "데이터를 불러올 수 없습니다.")
-                }
-                return
-            }
-            
-            let mapped = result.items
-            
-            DispatchQueue.main.async {
-                // allExchangeRates의 목적: 검색어를 지웠을 때 원래 데이터로 돌아가기 위함
-                self.allExchangeRates = mapped
-                self.filteredExchangeRates = mapped
-                self.exchangeRateTableView.reloadData()
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] state in
+            switch state {
+            case .success(let items):
+                self?.updateEmptyState(items)
+                self?.exchangeRateTableView.reloadData()
+            case .failure(let message):
+                self?.showAlert(title: "오류", message: message)
+            case .navigateToCalculator(let selectedItem):
+                let calculatorVC = CalculatorViewController(item: selectedItem)
+                self?.navigationController?.pushViewController(calculatorVC, animated: true)
             }
         }
-    }
-}
-
-extension MainViewController: UISearchBarDelegate {
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchText.isEmpty {
-            filteredExchangeRates = allExchangeRates
-        } else {
-            filteredExchangeRates = allExchangeRates.filter {
-                $0.code.lowercased().contains(searchText.lowercased()) ||
-                $0.countryName.contains(searchText)
-            }
-        }
-        
-        exchangeRateTableView.reloadData()
-        updateEmptyState()
     }
     
-    private func updateEmptyState() {
-        if filteredExchangeRates.isEmpty {
+    private func updateEmptyState(_ items: [ExchangeRateItem]) {
+        if items.isEmpty {
             exchangeRateTableView.backgroundView = emptyStateLabel
         } else {
             exchangeRateTableView.backgroundView = nil
@@ -134,9 +103,15 @@ extension MainViewController: UISearchBarDelegate {
     }
 }
 
+extension MainViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel.action?(.search(searchText))
+    }
+}
+
 extension MainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return filteredExchangeRates.count
+        return viewModel.state.items.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -144,7 +119,7 @@ extension MainViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let item = filteredExchangeRates[indexPath.row]
+        let item = viewModel.state.items[indexPath.row]
         cell.configure(with: item)
         
         return cell
@@ -153,8 +128,7 @@ extension MainViewController: UITableViewDataSource {
 
 extension MainViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedRate = filteredExchangeRates[indexPath.row]
-        let calculatorVC = CalculatorViewController(item: selectedRate)
-        navigationController?.pushViewController(calculatorVC, animated: true)
+        exchangeRateTableView.deselectRow(at: indexPath, animated: true)
+        viewModel.action?(.selectItem(index: indexPath.row))
     }
 }

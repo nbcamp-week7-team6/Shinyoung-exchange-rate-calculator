@@ -9,8 +9,6 @@ import UIKit
 import SnapKit
 
 class CalculatorViewController: UIViewController {
-    private let item: ExchangeRateItem
-    
     private let calculatorView = CalculatorView()
     
     private let titleLabel: UILabel = {
@@ -20,8 +18,10 @@ class CalculatorViewController: UIViewController {
         return label
     }()
     
+    private let viewModel: CalculatorViewModel
+    
     init(item: ExchangeRateItem) {
-        self.item = item
+        self.viewModel = CalculatorViewModel(exchangeRateItem: item)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -35,12 +35,13 @@ class CalculatorViewController: UIViewController {
         
         setupViews()
         setupConstraints()
-        calculatorView.configure(with: item)
+        calculatorView.configure(with: viewModel.exchangeRateItem)
         calculatorView.convertButton.addTarget(
             self,
             action: #selector(convertButtonTapped),
             for: .touchUpInside
         )
+        bindViewModel()
     }
     
     private func setupViews() {
@@ -65,18 +66,18 @@ class CalculatorViewController: UIViewController {
     }
     
     @objc private func convertButtonTapped() {
-        guard let text = calculatorView.inputAmount, !text.isEmpty else {
-            self.showAlert(title: "오류", message: "금액을 입력해주세요.")
-            return
+        let input = calculatorView.inputAmount ?? ""
+        viewModel.action?(.convert(input: input))
+    }
+    
+    private func bindViewModel() {
+        viewModel.onStateChange = { [weak self] state in
+            switch state {
+            case .showResult(let resultText):
+                self?.calculatorView.showResult(resultText)
+            case .showError(let message):
+                self?.showAlert(title: "오류", message: message)
+            }
         }
-        guard let amount = Double(text) else {
-            self.showAlert(title: "오류", message: "올바른 숫자를 입력해주세요.")
-            return
-        }
-        
-        let result = amount * item.rate
-        let formattedAmount = String(format: "%.2f", amount)
-        let formattedResult = String(format: "%.2f", result)
-        calculatorView.showResult("$\(formattedAmount) → \(formattedResult) \(item.code)")
     }
 }

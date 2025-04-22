@@ -62,7 +62,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                     return
                 }
                 
-                let mapped = result.items
+                let mapped = result.items.sorted { $0.code < $1.code }
+                
                 self.allExchangeRates = mapped
                 self.state.items = mapped
                 self.onStateChange?(.success(mapped))

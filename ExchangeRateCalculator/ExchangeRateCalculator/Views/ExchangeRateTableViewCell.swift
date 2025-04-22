@@ -36,6 +36,12 @@ class ExchangeRateTableViewCell: UITableViewCell {
         return label
     }()
     
+    private let favoriteButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "star.png"), for: .normal)
+        return button
+    }()
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -52,12 +58,13 @@ class ExchangeRateTableViewCell: UITableViewCell {
         [
             currencyCodeLabel,
             countryNameLabel
-        ].forEach {
-            currencyInfoStackView.addArrangedSubview($0)
-        }
+        ].forEach { currencyInfoStackView.addArrangedSubview($0) }
         
-        contentView.addSubview(currencyInfoStackView)
-        contentView.addSubview(exchangeRateLabel)
+        [
+            currencyInfoStackView,
+            exchangeRateLabel,
+            favoriteButton
+        ].forEach { contentView.addSubview($0) }
     }
     
     private func setupConstraints() {
@@ -67,10 +74,16 @@ class ExchangeRateTableViewCell: UITableViewCell {
         }
         
         exchangeRateLabel.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
             $0.leading.equalTo(currencyInfoStackView.snp.trailing).offset(16)
             $0.width.equalTo(120)
+        }
+        
+        favoriteButton.snp.makeConstraints {
+            $0.leading.equalTo(exchangeRateLabel.snp.trailing).offset(8)
+            $0.trailing.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(24)
         }
     }
     

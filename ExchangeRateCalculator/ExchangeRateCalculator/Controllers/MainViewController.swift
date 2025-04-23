@@ -46,6 +46,11 @@ final class MainViewController: UIViewController {
         self.navigationItem.backButtonTitle = "환율 정보"
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewModel.action?(.saveAppState(screen: "list", code: nil))
+    }
+    
     private func setupViews() {
         view.backgroundColor = UIColor(named: "BackgroundColor")
         [
@@ -89,6 +94,7 @@ final class MainViewController: UIViewController {
             case .failure(let message):
                 self?.showAlert(title: "오류", message: message)
             case .navigateToCalculator(let selectedItem):
+                self?.viewModel.action?(.saveAppState(screen: "calculator", code: selectedItem.code))
                 let calculatorVC = CalculatorViewController(item: selectedItem)
                 self?.navigationController?.pushViewController(calculatorVC, animated: true)
             }

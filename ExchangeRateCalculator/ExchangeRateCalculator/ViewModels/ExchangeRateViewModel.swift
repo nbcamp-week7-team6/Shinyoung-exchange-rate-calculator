@@ -13,6 +13,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         case search(String)
         case selectItem(index: Int)
         case toggleFavorite(code: String)
+        case saveAppState(screen: String, code: String?)
     }
     
     struct State {
@@ -48,6 +49,8 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 self?.handleSelection(at: index)
             case .toggleFavorite(let code):
                 self?.toggleFavorite(code: code)
+            case .saveAppState(let screen, let code):
+                CoreDataService.shared.saveAppState(screen: screen, code: code)
             }
         }
     }

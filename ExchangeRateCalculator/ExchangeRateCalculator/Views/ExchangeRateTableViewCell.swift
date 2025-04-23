@@ -18,13 +18,14 @@ class ExchangeRateTableViewCell: UITableViewCell {
     private let currencyCodeLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.HomeView.currencyCode
+        label.textColor = ColorStyle.text
         return label
     }()
     
     private let countryNameLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.HomeView.countryName
-        label.textColor = .gray
+        label.textColor = ColorStyle.secondaryText
         return label
     }()
     
@@ -38,6 +39,7 @@ class ExchangeRateTableViewCell: UITableViewCell {
     private let exchangeRateLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.HomeView.rate
+        label.textColor = ColorStyle.text
         label.textAlignment = .right
         return label
     }()

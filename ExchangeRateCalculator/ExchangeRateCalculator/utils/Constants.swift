@@ -32,3 +32,21 @@ enum FontStyle {
         static let resultLabel = UIFont.systemFont(ofSize: 20, weight: .medium)
     }
 }
+
+enum ColorStyle {
+    static var text: UIColor {
+        return UIColor(named: "TextColor") ?? .label
+    }
+
+    static var secondaryText: UIColor {
+        return UIColor(named: "SecondaryTextColor") ?? .secondaryLabel
+    }
+
+    static var cellBackground: UIColor {
+        return UIColor(named: "CellBackgroundColor") ?? .secondarySystemBackground
+    }
+    
+    static var buttonBackground: UIColor {
+        return UIColor(named: "ButtonColor") ?? .systemBlue
+    }
+}

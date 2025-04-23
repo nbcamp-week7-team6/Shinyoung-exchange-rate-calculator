@@ -13,6 +13,7 @@ final class MainViewController: UIViewController {
         let label = UILabel()
         label.text = "환율 정보"
         label.font = FontStyle.titleLabel
+        label.textColor = ColorStyle.text
         return label
     }()
     private let searchBar: UISearchBar = {
@@ -25,7 +26,7 @@ final class MainViewController: UIViewController {
         label.text = "검색 결과 없음"
         label.textAlignment = .center
         label.font = FontStyle.HomeView.countryName
-        label.textColor = .gray
+        label.textColor = ColorStyle.secondaryText
         return label
     }()
     private let exchangeRateTableView = ExchangeRateTableView()
@@ -46,7 +47,7 @@ final class MainViewController: UIViewController {
     }
     
     private func setupViews() {
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(named: "BackgroundColor")
         [
             titleLabel,
             searchBar,

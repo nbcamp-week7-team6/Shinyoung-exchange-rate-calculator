@@ -57,17 +57,39 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         networkService.fetchData(url: url) { [weak self] (result: ExchangeRateResult?) in
             guard let self else { return }
             
-            DispatchQueue.main.async {
-                guard let result else {
+            guard let result else {
+                DispatchQueue.main.async {
                     self.onStateChange?(.failure(message: "데이터를 불러올 수 없습니다."))
-                    return
                 }
-                
-                let mapped = self.applyFavoriteSorting(to: result.items)
-                
-                self.allExchangeRates = mapped
-                self.state.items = mapped
-                self.onStateChange?(.success(mapped))
+                return
+            }
+            
+            let prevRates = CoreDataService.shared.fetchCachedRates()
+            
+            let mapped = result.items.map { item -> ExchangeRateItem in
+                var mutableItem = item
+                if let oldRate = prevRates[item.code] {
+                    let diff = abs(oldRate - item.rate)
+                    if diff <= 0.01 {
+                        mutableItem.change = .same
+                    } else {
+                        mutableItem.change = (item.rate > oldRate) ? .up : .down
+                    }
+                } else {
+                    mutableItem.change = .unknown
+                }
+                return mutableItem
+            }
+            
+            CoreDataService.shared.updateCachedRates(with: mapped, updatedAt: result.timeLastUpdateUtc)
+            
+            let sorted = self.applyFavoriteSorting(to: mapped)
+            
+            self.allExchangeRates = sorted
+            self.state.items = sorted
+            
+            DispatchQueue.main.async {
+                self.onStateChange?(.success(sorted))
             }
         }
     }

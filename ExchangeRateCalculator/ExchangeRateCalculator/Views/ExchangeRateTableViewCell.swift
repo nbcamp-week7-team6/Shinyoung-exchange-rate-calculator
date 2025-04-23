@@ -42,6 +42,11 @@ class ExchangeRateTableViewCell: UITableViewCell {
         return label
     }()
     
+    private let changeIconLabel: UILabel = {
+        let label = UILabel()
+        return label
+    }()
+    
     private let favoriteButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "star.png"), for: .normal)
@@ -70,6 +75,7 @@ class ExchangeRateTableViewCell: UITableViewCell {
         [
             currencyInfoStackView,
             exchangeRateLabel,
+            changeIconLabel,
             favoriteButton
         ].forEach { contentView.addSubview($0) }
         
@@ -88,6 +94,12 @@ class ExchangeRateTableViewCell: UITableViewCell {
             $0.width.equalTo(120)
         }
         
+        changeIconLabel.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalTo(exchangeRateLabel.snp.trailing).offset(4)
+            $0.width.height.equalTo(16)
+        }
+        
         favoriteButton.snp.makeConstraints {
             $0.leading.equalTo(exchangeRateLabel.snp.trailing).offset(8)
             $0.trailing.equalToSuperview().inset(16)
@@ -101,6 +113,15 @@ class ExchangeRateTableViewCell: UITableViewCell {
         countryNameLabel.text = item.countryName
         exchangeRateLabel.text = String(format: "%.4f", item.rate)
         favoriteButton.isSelected = isFavorite
+        
+        switch item.change {
+        case .up:
+            changeIconLabel.text = "🔼"
+        case .down:
+            changeIconLabel.text = "🔽"
+        case .same, .unknown:
+            changeIconLabel.text = nil
+        }
     }
     
     @objc private func favoriteTapped() {

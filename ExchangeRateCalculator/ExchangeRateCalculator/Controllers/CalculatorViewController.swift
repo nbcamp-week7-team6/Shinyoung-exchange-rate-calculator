@@ -15,6 +15,7 @@ class CalculatorViewController: UIViewController {
         let label = UILabel()
         label.text = "환율 계산기"
         label.font = FontStyle.titleLabel
+        label.textColor = ColorStyle.text
         return label
     }()
     
@@ -45,7 +46,7 @@ class CalculatorViewController: UIViewController {
     }
     
     private func setupViews() {
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(named: "BackgroundColor")
         [
             titleLabel,
             calculatorView

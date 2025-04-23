@@ -13,6 +13,7 @@ final class MainViewController: UIViewController {
         let label = UILabel()
         label.text = "환율 정보"
         label.font = FontStyle.titleLabel
+        label.textColor = ColorStyle.text
         return label
     }()
     private let searchBar: UISearchBar = {
@@ -25,12 +26,12 @@ final class MainViewController: UIViewController {
         label.text = "검색 결과 없음"
         label.textAlignment = .center
         label.font = FontStyle.HomeView.countryName
-        label.textColor = .gray
+        label.textColor = ColorStyle.secondaryText
         return label
     }()
     private let exchangeRateTableView = ExchangeRateTableView()
     
-    private let viewModel = ExchangeRateViewModel()
+    private let viewModel = ExchangeRateViewModel(networkService: MockNetworkService())
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,8 +46,13 @@ final class MainViewController: UIViewController {
         self.navigationItem.backButtonTitle = "환율 정보"
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewModel.action?(.saveAppState(screen: "list", code: nil))
+    }
+    
     private func setupViews() {
-        view.backgroundColor = .white
+        view.backgroundColor = UIColor(named: "BackgroundColor")
         [
             titleLabel,
             searchBar,
@@ -88,6 +94,7 @@ final class MainViewController: UIViewController {
             case .failure(let message):
                 self?.showAlert(title: "오류", message: message)
             case .navigateToCalculator(let selectedItem):
+                self?.viewModel.action?(.saveAppState(screen: "calculator", code: selectedItem.code))
                 let calculatorVC = CalculatorViewController(item: selectedItem)
                 self?.navigationController?.pushViewController(calculatorVC, animated: true)
             }
@@ -120,7 +127,10 @@ extension MainViewController: UITableViewDataSource {
         }
         
         let item = viewModel.state.items[indexPath.row]
-        cell.configure(with: item)
+        let isFavorite = Set(CoreDataService.shared.fetchFavorites()).contains(item.code)
+        
+        cell.delegate = self
+        cell.configure(with: item, isFavorite: isFavorite)
         
         return cell
     }
@@ -130,5 +140,13 @@ extension MainViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         exchangeRateTableView.deselectRow(at: indexPath, animated: true)
         viewModel.action?(.selectItem(index: indexPath.row))
+    }
+}
+
+extension MainViewController: ExchangeRateTableViewCellDelegate {
+    func didTapFavoriteButton(in cell: ExchangeRateTableViewCell) {
+        guard let indexPath = exchangeRateTableView.indexPath(for: cell) else { return }
+        let item = viewModel.state.items[indexPath.row]
+        viewModel.action?(.toggleFavorite(code: item.code))
     }
 }

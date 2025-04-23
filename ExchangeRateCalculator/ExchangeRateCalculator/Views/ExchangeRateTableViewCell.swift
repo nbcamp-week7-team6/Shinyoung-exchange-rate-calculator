@@ -8,17 +8,24 @@
 import UIKit
 import SnapKit
 
+protocol ExchangeRateTableViewCellDelegate: AnyObject {
+    func didTapFavoriteButton(in cell: ExchangeRateTableViewCell)
+}
+
 class ExchangeRateTableViewCell: UITableViewCell {
+    weak var delegate: ExchangeRateTableViewCellDelegate?
+    
     private let currencyCodeLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.HomeView.currencyCode
+        label.textColor = ColorStyle.text
         return label
     }()
     
     private let countryNameLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.HomeView.countryName
-        label.textColor = .gray
+        label.textColor = ColorStyle.secondaryText
         return label
     }()
     
@@ -32,8 +39,21 @@ class ExchangeRateTableViewCell: UITableViewCell {
     private let exchangeRateLabel: UILabel = {
         let label = UILabel()
         label.font = FontStyle.HomeView.rate
+        label.textColor = ColorStyle.text
         label.textAlignment = .right
         return label
+    }()
+    
+    private let changeIconLabel: UILabel = {
+        let label = UILabel()
+        return label
+    }()
+    
+    private let favoriteButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(named: "star.png"), for: .normal)
+        button.setImage(UIImage(named: "star.fill.png"), for: .selected)
+        return button
     }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -52,12 +72,16 @@ class ExchangeRateTableViewCell: UITableViewCell {
         [
             currencyCodeLabel,
             countryNameLabel
-        ].forEach {
-            currencyInfoStackView.addArrangedSubview($0)
-        }
+        ].forEach { currencyInfoStackView.addArrangedSubview($0) }
         
-        contentView.addSubview(currencyInfoStackView)
-        contentView.addSubview(exchangeRateLabel)
+        [
+            currencyInfoStackView,
+            exchangeRateLabel,
+            changeIconLabel,
+            favoriteButton
+        ].forEach { contentView.addSubview($0) }
+        
+        favoriteButton.addTarget(self, action: #selector(favoriteTapped), for: .touchUpInside)
     }
     
     private func setupConstraints() {
@@ -67,16 +91,42 @@ class ExchangeRateTableViewCell: UITableViewCell {
         }
         
         exchangeRateLabel.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
             $0.leading.equalTo(currencyInfoStackView.snp.trailing).offset(16)
             $0.width.equalTo(120)
         }
+        
+        changeIconLabel.snp.makeConstraints {
+            $0.centerY.equalToSuperview()
+            $0.leading.equalTo(exchangeRateLabel.snp.trailing).offset(8)
+            $0.width.height.equalTo(24)
+        }
+        
+        favoriteButton.snp.makeConstraints {
+            $0.leading.equalTo(changeIconLabel.snp.trailing).offset(8)
+            $0.trailing.equalToSuperview().inset(16)
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(24)
+        }
     }
     
-    func configure(with item: ExchangeRateItem) {
+    func configure(with item: ExchangeRateItem, isFavorite: Bool) {
         currencyCodeLabel.text = item.code
         countryNameLabel.text = item.countryName
         exchangeRateLabel.text = String(format: "%.4f", item.rate)
+        favoriteButton.isSelected = isFavorite
+        
+        switch item.change {
+        case .up:
+            changeIconLabel.text = "🔼"
+        case .down:
+            changeIconLabel.text = "🔽"
+        case .same, .unknown:
+            changeIconLabel.text = nil
+        }
+    }
+    
+    @objc private func favoriteTapped() {
+        delegate?.didTapFavoriteButton(in: self)
     }
 }

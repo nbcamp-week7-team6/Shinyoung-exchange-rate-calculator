@@ -7,10 +7,15 @@
 
 import Foundation
 
+enum RateChange {
+    case up, down, same, unknown
+}
+
 struct ExchangeRateItem {
     let code: String
     let countryName: String
     let rate: Double
+    var change: RateChange = .unknown
 }
 
 extension ExchangeRateResult {

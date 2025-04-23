@@ -30,7 +30,7 @@ final class MainViewController: UIViewController {
     }()
     private let exchangeRateTableView = ExchangeRateTableView()
     
-    private let viewModel = ExchangeRateViewModel()
+    private let viewModel = ExchangeRateViewModel(networkService: MockNetworkService())
     
     override func viewDidLoad() {
         super.viewDidLoad()

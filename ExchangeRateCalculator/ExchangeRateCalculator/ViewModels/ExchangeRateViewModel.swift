@@ -25,14 +25,15 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         case navigateToCalculator(selectedItem: ExchangeRateItem)
     }
     
-    private let networkService = NetworkService()
+    private let networkService: NetworkServiceProtocol
     private var allExchangeRates = [ExchangeRateItem]()
     
     var action: ((Action) -> Void)?
     private(set) var state = State()
     var onStateChange: ((ViewState) -> Void)?
     
-    init() {
+    init(networkService: NetworkServiceProtocol = NetworkService()) {
+        self.networkService = networkService
         bind()
     }
     

@@ -96,12 +96,12 @@ class ExchangeRateTableViewCell: UITableViewCell {
         
         changeIconLabel.snp.makeConstraints {
             $0.centerY.equalToSuperview()
-            $0.leading.equalTo(exchangeRateLabel.snp.trailing).offset(4)
-            $0.width.height.equalTo(16)
+            $0.leading.equalTo(exchangeRateLabel.snp.trailing).offset(8)
+            $0.width.height.equalTo(24)
         }
         
         favoriteButton.snp.makeConstraints {
-            $0.leading.equalTo(exchangeRateLabel.snp.trailing).offset(8)
+            $0.leading.equalTo(changeIconLabel.snp.trailing).offset(8)
             $0.trailing.equalToSuperview().inset(16)
             $0.centerY.equalToSuperview()
             $0.width.height.equalTo(24)

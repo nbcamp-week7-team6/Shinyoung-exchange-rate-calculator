@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class NetworkService {
+final class NetworkService: NetworkServiceProtocol {
     func fetchData<T: Decodable>(url: URL, completion: @escaping (T?) -> Void) {
         let session = URLSession(configuration: .default)
         session.dataTask(with: URLRequest(url: url)) { data, response, error in

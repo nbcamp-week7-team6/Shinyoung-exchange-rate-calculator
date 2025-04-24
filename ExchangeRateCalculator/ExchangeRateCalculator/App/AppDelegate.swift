@@ -12,6 +12,7 @@ import CoreData
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Core Data의 context를 CoreDataService에 주입합니다.
         CoreDataService.shared.configure(context: persistentContainer.viewContext)
         
         return true

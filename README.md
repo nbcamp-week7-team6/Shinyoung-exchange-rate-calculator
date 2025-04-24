@@ -41,6 +41,7 @@ enum Action {
     case search(String)
     case selectItem(index: Int)
     case toggleFavorite(code: String)
+    case saveAppState(screen: String, code: String?)
 }
 
 struct State {

@@ -37,6 +37,10 @@ class CalculatorViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        print("#### CalculatorViewController deinit")
+    }
+    
     // MARK: - 생명주기
 
     override func viewDidLoad() {

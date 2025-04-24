@@ -46,6 +46,10 @@ final class CalculatorViewModel: ViewModelProtocol {
         bind()
     }
     
+    deinit {
+        print("#### CalculatorViewModel deinit")
+    }
+    
     /// 사용자 액션을 처리할 클로저 바인딩
     private func bind() {
         action = { [weak self] action in

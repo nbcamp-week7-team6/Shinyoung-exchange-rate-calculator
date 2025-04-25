@@ -22,8 +22,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // CoreDataService에 context 주입
         CoreDataService.shared.configure(context: (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext)
         
+        let viewModel = ExchangeRateViewModel(
+            fetchExchangeRatesUseCase: DefaultFetchExchangeRatesUseCase(
+                repository: DefaultExchangeRateRepository()
+            ),
+            toggleFavoriteUseCase: DefaultToggleFavoriteCurrencyUseCase(),
+            fetchFavoritesUseCase: DefaultFetchFavoriteCurrencyCodesUseCase(),
+            saveAppStateUseCase: DefaultSaveAppStateUseCase(),
+            updateExchangeRateCacheUseCase: DefaultUpdateExchangeRateCacheUseCase())
+        
         // 메인 화면 (환율 목록 화면) 생성
-        let mainVC = MainViewController()
+        let mainVC = MainViewController(viewModel: viewModel)
         
         // Calculator 화면에서 뒤로가기 버튼 제목을 "환율 정보"로 표시
         let backItem = UIBarButtonItem()

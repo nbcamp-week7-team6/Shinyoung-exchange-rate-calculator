@@ -40,7 +40,17 @@ final class MainViewController: UIViewController {
     private let exchangeRateTableView = ExchangeRateTableView()
     
     /// 환율 목록을 관리하는 뷰모델
-    private let viewModel = ExchangeRateViewModel(networkService: MockNetworkService())
+    private let viewModel: ExchangeRateViewModel
+    
+    init(viewModel: ExchangeRateViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -154,7 +164,7 @@ extension MainViewController: UITableViewDataSource {
         }
         
         let item = viewModel.state.items[indexPath.row]
-        let isFavorite = Set(CoreDataService.shared.fetchFavorites()).contains(item.code)
+        let isFavorite = viewModel.isFavorite(code: item.code)
         
         cell.delegate = self
         cell.configure(with: item, isFavorite: isFavorite)

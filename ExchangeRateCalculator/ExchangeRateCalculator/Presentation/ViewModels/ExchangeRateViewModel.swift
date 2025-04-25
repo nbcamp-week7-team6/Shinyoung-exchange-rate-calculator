@@ -39,6 +39,10 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     }
     
     private let fetchExchangeRatesUseCase: FetchExchangeRatesUseCase
+    private let toggleFavoriteUseCase: ToggleFavoriteCurrencyUseCase
+    private let fetchFavoritesUseCase: FetchFavoriteCurrencyCodesUseCase
+    private let saveAppStateUseCase: SaveAppStateUseCase
+    private let updateExchangeRateCacheUseCase: UpdateExchangeRateCacheUseCase
     // 전체 환율 목록
     private var allExchangeRates = [ExchangeRateItem]()
     
@@ -50,8 +54,18 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     var onStateChange: ((ViewState) -> Void)?
     
     /// 초기화 시 networkService를 주입받고 액션을 바인딩
-    init(fetchExchangeRatesUseCase: FetchExchangeRatesUseCase) {
+    init(
+        fetchExchangeRatesUseCase: FetchExchangeRatesUseCase,
+        toggleFavoriteUseCase: ToggleFavoriteCurrencyUseCase,
+        fetchFavoritesUseCase: FetchFavoriteCurrencyCodesUseCase,
+        saveAppStateUseCase: SaveAppStateUseCase,
+        updateExchangeRateCacheUseCase: UpdateExchangeRateCacheUseCase
+    ) {
         self.fetchExchangeRatesUseCase = fetchExchangeRatesUseCase
+        self.toggleFavoriteUseCase = toggleFavoriteUseCase
+        self.fetchFavoritesUseCase = fetchFavoritesUseCase
+        self.saveAppStateUseCase = saveAppStateUseCase
+        self.updateExchangeRateCacheUseCase = updateExchangeRateCacheUseCase
         
         bind()
     }
@@ -69,7 +83,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             case .toggleFavorite(let code):
                 self?.toggleFavorite(code: code)
             case .saveAppState(let screen, let code):
-                CoreDataService.shared.saveAppState(screen: screen, code: code)
+                self?.saveAppStateUseCase.execute(screen: screen, code: code)
             }
         }
     }
@@ -81,7 +95,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             
             switch result {
             case .success(let (items, updatedAt)):
-                CoreDataService.shared.updateCachedRates(with: items, updatedAt: updatedAt)
+                self.updateExchangeRateCacheUseCase.execute(items: items, updatedAt: updatedAt)
                 
                 // 즐겨찾기 기준으로 정렬
                 let sorted = self.applyFavoriteSorting(to: items)
@@ -92,7 +106,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
                 DispatchQueue.main.async {
                     self.onStateChange?(.success(sorted))
                 }
-            case .failure(let error):
+            case .failure(_):
                 DispatchQueue.main.async {
                     self.onStateChange?(.failure(message: "데이터를 불러올 수 없습니다."))
                 }
@@ -131,20 +145,14 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     
     /// 즐겨찾기 토글 (추가 또는 제거 후 리스트 갱신)
     private func toggleFavorite(code: String) {
-        let isFavorite = CoreDataService.shared.fetchFavorites().contains(code)
-        
-        if isFavorite {
-            CoreDataService.shared.removeFavorite(code: code)
-        } else {
-            CoreDataService.shared.addFavorite(code: code)
-        }
+        toggleFavoriteUseCase.execute(code: code)
         
         filterExchangeRates(with: "")
     }
     
     /// 즐겨찾기 여부에 따라 정렬된 리스트 반환
     private func applyFavoriteSorting(to items: [ExchangeRateItem]) -> [ExchangeRateItem] {
-        let favorites = Set(CoreDataService.shared.fetchFavorites())
+        let favorites = Set(fetchFavoritesUseCase.execute())
         
         return items.sorted {
             if favorites.contains($0.code) == favorites.contains($1.code) {
@@ -154,5 +162,9 @@ final class ExchangeRateViewModel: ViewModelProtocol {
             // 즐겨찾기 먼저 정렬
             return favorites.contains($0.code)
         }
+    }
+    
+    func isFavorite(code: String) -> Bool {
+        return Set(fetchFavoritesUseCase.execute()).contains(code)
     }
 }

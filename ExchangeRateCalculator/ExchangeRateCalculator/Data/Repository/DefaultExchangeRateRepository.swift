@@ -14,21 +14,18 @@ final class DefaultExchangeRateRepository: ExchangeRateRepository {
         self.networkService = networkService
     }
     
-    func fetchLatestRates() async throws -> (items: [ExchangeRateItem], updatedAt: String) {
+    func fetchLatestRates(completion: @escaping (Result<([ExchangeRateItem], String), Error>) -> Void) {
         guard let url = URL(string: API.latestRates) else {
-            throw URLError(.badURL)
+            completion(.failure(URLError(.badURL)))
+            return
         }
         
-        let result: ExchangeRateResult = try await withCheckedThrowingContinuation { continuation in
-            networkService.fetchData(url: url) { (response: ExchangeRateResult?) in
-                if let response {
-                    continuation.resume(returning: response)
-                } else {
-                    continuation.resume(throwing: URLError(.badServerResponse))
-                }
+        networkService.fetchData(url: url) { (response: ExchangeRateResult?) in
+            if let response {
+                completion(.success((response.items, response.timeLastUpdateUtc)))
+            } else {
+                completion(.failure(URLError(.badServerResponse)))
             }
         }
-        
-        return (items: result.items, updatedAt: result.timeLastUpdateUtc)
     }
 }

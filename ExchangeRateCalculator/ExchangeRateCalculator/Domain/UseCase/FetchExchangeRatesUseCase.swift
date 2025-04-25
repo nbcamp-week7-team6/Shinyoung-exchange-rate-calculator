@@ -8,5 +8,5 @@
 import Foundation
 
 protocol FetchExchangeRatesUseCase {
-    func execute() async throws -> (items: [ExchangeRateItem], updatedAt: String)
+    func execute(completion: @escaping (Result<([ExchangeRateItem], String), Error>) -> Void)
 }

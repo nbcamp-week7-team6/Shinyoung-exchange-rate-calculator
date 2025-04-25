@@ -38,8 +38,7 @@ final class ExchangeRateViewModel: ViewModelProtocol {
         case navigateToCalculator(selectedItem: ExchangeRateItem)
     }
     
-    // 네트워크 서비스 (실제 or Mock 주입 가능)
-    private let networkService: NetworkServiceProtocol
+    private let fetchExchangeRatesUseCase: FetchExchangeRatesUseCase
     // 전체 환율 목록
     private var allExchangeRates = [ExchangeRateItem]()
     
@@ -51,8 +50,9 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     var onStateChange: ((ViewState) -> Void)?
     
     /// 초기화 시 networkService를 주입받고 액션을 바인딩
-    init(networkService: NetworkServiceProtocol = NetworkService()) {
-        self.networkService = networkService
+    init(fetchExchangeRatesUseCase: FetchExchangeRatesUseCase) {
+        self.fetchExchangeRatesUseCase = fetchExchangeRatesUseCase
+        
         bind()
     }
     
@@ -76,33 +76,26 @@ final class ExchangeRateViewModel: ViewModelProtocol {
     
     /// 최신 환율 데이터를 API로부터 받아와 상태 업데이트
     private func fetchExchangeRate() {
-        guard let url = URL(string: API.latestRates) else { return }
-        
-        networkService.fetchData(url: url) { [weak self] (result: ExchangeRateResult?) in
+        fetchExchangeRatesUseCase.execute { [weak self] result in
             guard let self else { return }
             
-            guard let result else {
+            switch result {
+            case .success(let (items, updatedAt)):
+                CoreDataService.shared.updateCachedRates(with: items, updatedAt: updatedAt)
+                
+                // 즐겨찾기 기준으로 정렬
+                let sorted = self.applyFavoriteSorting(to: items)
+                self.allExchangeRates = sorted
+                self.state.items = sorted
+                
+                // View 업데이트
+                DispatchQueue.main.async {
+                    self.onStateChange?(.success(sorted))
+                }
+            case .failure(let error):
                 DispatchQueue.main.async {
                     self.onStateChange?(.failure(message: "데이터를 불러올 수 없습니다."))
                 }
-                return
-            }
-            
-            
-            
-            
-            
-            
-            
-            // 즐겨찾기 기준으로 정렬
-            let sorted = self.applyFavoriteSorting(to: mapped)
-            
-            self.allExchangeRates = sorted
-            self.state.items = sorted
-            
-            // View 업데이트
-            DispatchQueue.main.async {
-                self.onStateChange?(.success(sorted))
             }
         }
     }

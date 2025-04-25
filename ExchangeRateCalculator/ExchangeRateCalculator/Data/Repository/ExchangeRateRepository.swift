@@ -8,5 +8,5 @@
 import Foundation
 
 protocol ExchangeRateRepository {
-    func fetchLatestRates() async throws -> (items: [ExchangeRateItem], updatedAt: String)
+    func fetchLatestRates(completion: @escaping (Result<([ExchangeRateItem], String), Error>) -> Void)
 }

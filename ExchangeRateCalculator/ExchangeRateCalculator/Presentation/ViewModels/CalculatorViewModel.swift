@@ -31,6 +31,7 @@ final class CalculatorViewModel: ViewModelProtocol {
     
     /// 선택된 환율 아이템
     let exchangeRateItem: ExchangeRateItem
+    private let convertCurrencyUseCase: ConvertCurrencyUseCase
     
     /// 외부에서 액션을 전달받는 클로저
     var action: ((Action) -> Void)?
@@ -40,8 +41,12 @@ final class CalculatorViewModel: ViewModelProtocol {
     var onStateChange: ((ViewState) -> Void)?
     
     /// 초기화 시 환율 데이터를 주입받고 액션을 바인딩
-    init(exchangeRateItem: ExchangeRateItem) {
+    init(
+        exchangeRateItem: ExchangeRateItem,
+        convertCurrencyUseCase: ConvertCurrencyUseCase
+    ) {
         self.exchangeRateItem = exchangeRateItem
+        self.convertCurrencyUseCase = convertCurrencyUseCase
         
         bind()
     }
@@ -53,34 +58,23 @@ final class CalculatorViewModel: ViewModelProtocol {
     /// 사용자 액션을 처리할 클로저 바인딩
     private func bind() {
         action = { [weak self] action in
+            guard let self else { return }
             switch action{
             case .convert(let input):
-                self?.convertAmount(input)
+                let result = self.convertCurrencyUseCase.execute(
+                    input: input,
+                    rate: self.exchangeRateItem.rate,
+                    code: self.exchangeRateItem.code
+                )
+                
+                switch result {
+                case .success(let resultText):
+                    self.state.resultText = resultText
+                    self.onStateChange?(.showResult(resultText))
+                case .failure(let error):
+                    self.onStateChange?(.showError(message: error.localizedDescription))
+                }
             }
         }
-    }
-    
-    /// 입력된 문자열을 Double로 변환 후 환율 계산 로직 실행
-    private func convertAmount(_ input: String) {
-        // 입력값이 비어있으면 에러 반환
-        guard !input.isEmpty else {
-            onStateChange?(.showError(message: "금액을 입력해주세요."))
-            return
-        }
-        // 숫자로 변환되지 않으면 에러 반환
-        guard let amount = Double(input) else {
-            onStateChange?(.showError(message: "올바른 숫자를 입력해주세요."))
-            return
-        }
-        
-        // 환율 계산 및 결과 포맷팅
-        let result = amount * exchangeRateItem.rate
-        let formattedAmount = String(format: "%.2f", amount)
-        let formattedResult = String(format: "%.2f", result)
-        let resultText = "$\(formattedAmount) → \(formattedResult) \(exchangeRateItem.code)"
-        
-        // 상태 업데이트 및 결과 전달
-        state.resultText = resultText
-        onStateChange?(.showResult(resultText))
     }
 }

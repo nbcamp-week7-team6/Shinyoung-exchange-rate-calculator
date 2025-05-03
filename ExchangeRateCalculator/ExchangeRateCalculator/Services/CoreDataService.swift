@@ -110,8 +110,12 @@ final class CoreDataService {
         
         // 기존 데이터 모두 삭제
         let deleteRequest = CachedExchangeRate.fetchRequest()
-        if let old = try? context.fetch(deleteRequest) {
-            old.forEach { context.delete($0) }
+        do {
+            let oldCachedRates = try context.fetch(deleteRequest)
+            let copy = oldCachedRates.map { $0 }
+            copy.forEach { context.delete($0) }
+        } catch {
+            print("기존 캐시 삭제 실패: \(error.localizedDescription)")
         }
         
         // 새로운 데이터 저장

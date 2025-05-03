@@ -18,7 +18,7 @@ struct ExchangeRateItem {
     var change: RateChange = .unknown
 }
 
-extension ExchangeRateResult {
+extension ExchangeRateDTO {
     var items: [ExchangeRateItem] {
         rates.map { code, rate in
             ExchangeRateItem(code: code, countryName: currencyCountryMap[code] ?? "", rate: rate)

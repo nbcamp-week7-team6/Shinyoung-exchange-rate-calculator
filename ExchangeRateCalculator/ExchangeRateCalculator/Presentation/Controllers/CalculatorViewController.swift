@@ -26,8 +26,14 @@ class CalculatorViewController: UIViewController {
     private let viewModel: CalculatorViewModel
     
     /// 주어진 환율 아이템으로 계산기 화면 초기화
-    init(item: ExchangeRateItem) {
-        self.viewModel = CalculatorViewModel(exchangeRateItem: item)
+    init(
+        item: ExchangeRateItem,
+        convertCurrencyUseCase: ConvertCurrencyUseCase = DefaultConvertCurrencyUseCase()
+    ) {
+        self.viewModel = CalculatorViewModel(
+            exchangeRateItem: item,
+            convertCurrencyUseCase: convertCurrencyUseCase
+        )
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -35,6 +41,10 @@ class CalculatorViewController: UIViewController {
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("#### CalculatorViewController deinit")
     }
     
     // MARK: - 생명주기

@@ -1,5 +1,5 @@
 //
-//  ExchangeRate.swift
+//  ExchangeRateDTO.swift
 //  ExchangeRateCalculator
 //
 //  Created by shinyoungkim on 4/16/25.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ExchangeRateResult: Decodable {
+struct ExchangeRateDTO: Decodable {
     let timeLastUpdateUtc: String
     let rates: [String: Double]
     

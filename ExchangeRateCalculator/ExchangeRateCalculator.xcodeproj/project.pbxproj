@@ -18,7 +18,7 @@
 		285261102DAF66FD00013F79 /* Exceptions for "ExchangeRateCalculator" folder in "ExchangeRateCalculator" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				App/Info.plist,
+				Application/Info.plist,
 			);
 			target = 285260FA2DAF66FC00013F79 /* ExchangeRateCalculator */;
 		};

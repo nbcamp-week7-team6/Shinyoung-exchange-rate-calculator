@@ -20,7 +20,7 @@ final class DefaultExchangeRateRepository: ExchangeRateRepository {
             return
         }
         
-        networkService.fetchData(url: url) { (response: ExchangeRateResult?) in
+        networkService.fetchData(url: url) { (response: ExchangeRateDTO?) in
             if let response {
                 completion(.success((response.items, response.timeLastUpdateUtc)))
             } else {
